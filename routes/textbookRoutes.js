@@ -6,7 +6,7 @@ const Category = require('../models/Category');
 // Получение всех учебников
 router.get('/books', async (req, res) => {
   try {
-    const textbooks = await Textbook.find();
+    const textbooks = await Textbook.find({ isVisible: true });
     res.json(textbooks);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch textbooks' });

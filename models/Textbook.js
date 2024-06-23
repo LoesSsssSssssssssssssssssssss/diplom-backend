@@ -27,6 +27,25 @@ const textbookSchema = new mongoose.Schema({
     ref: 'Category',
     required: true,
   },
+  isVisible: {
+    type: Boolean,
+    default: false,
+  },
+  ratings: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
+      rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5,
+      },
+    },
+  ],
 });
 
 const Textbook = mongoose.model('Textbook', textbookSchema);

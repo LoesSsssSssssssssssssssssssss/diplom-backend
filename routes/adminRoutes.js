@@ -99,6 +99,42 @@ router.put(
   }
 );
 
+router.patch(
+  '/books/:id/visibility',
+  authenticateUser,
+  checkAdmin,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isVisible } = req.body;
+
+      const textbook = await Textbook.findByIdAndUpdate(
+        id,
+        { isVisible },
+        { new: true }
+      );
+
+      if (!textbook) {
+        return res.status(404).json({ error: 'Textbook not found' });
+      }
+
+      res.json(textbook);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update textbook visibility' });
+    }
+  }
+);
+
+// Получение всех учебников
+router.get('/books', async (req, res) => {
+  try {
+    const textbooks = await Textbook.find();
+    res.json(textbooks);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch textbooks' });
+  }
+});
+
 // Маршрут для добавления нового учебника
 router.post('/add', authenticateUser, checkAdmin, async (req, res) => {
   const { title, description, category } = req.body;
