@@ -326,6 +326,72 @@ router.delete('/books/:id', authenticateUser, checkAdmin, async (req, res) => {
   }
 });
 
+// Получение всех категорий
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+// Обновление категории
+router.put(
+  '/categories/:id',
+  authenticateUser,
+  checkAdmin,
+  uploadCategoryImage.single('image'),
+  async (req, res) => {
+    const { id } = req.params;
+    const { name, description } = req.body;
+    const image = req.file
+      ? `uploads/categoryImages/${req.file.filename}`
+      : null;
+
+    try {
+      const updateData = { name, description };
+      if (image) updateData.image = image;
+
+      const category = await Category.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
+
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+
+      res.json({ message: 'Категория успешно обновлена', category });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to update category' });
+    }
+  }
+);
+
+// Удаление категории
+router.delete(
+  '/categories/:id',
+  authenticateUser,
+  checkAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const category = await Category.findByIdAndDelete(id);
+
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+
+      res.json({ message: 'Категория успешно удалена' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to delete category' });
+    }
+  }
+);
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
